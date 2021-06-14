@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>JSON DISPLAY DATA</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+		<script src="http://login2explore.com/jpdb/resources/js/0.0.3/jpdb-commons.js"></script>
+	</head>
+	
+	<body>
+
+		<div class="container">
+            <div style="margin-left:17%">
+                <h2>Display Employee</h2>
+            </div>
+
+            <!-- Employee Form -->
+            <form class="form-horizontal" id="empForm" onsubmit="return getEmployee();">
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="empId">Employee_ID*</label>
+                    <div class="col-sm-10">
+                        <input type="text" required class="form-control" id="empId" placeholder="Employee ID" name="empId">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="empName">Name*</label>
+                    <div class="col-sm-10">
+                        <input type="text" required class="form-control" id="empName" placeholder="Name" name="empName" disabled>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="email">Email*</label>
+                    <div class="col-sm-10">
+                        <input type="text" required class="form-control" id="empEmail" placeholder="Employee Email" name="empEmail" disabled>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="empSalary">Employee_Basic_Salary*</label>
+                    <div class="col-sm-10">
+                        <input type="number" required class="form-control" id="empSalary" placeholder="Employee Basic Salary" name="empSalary" disabled>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="empAllowance">Employee_Allowance</label>
+                    <div class="col-sm-10">
+                        <input type="number"  class="form-control" id="empAllowance" placeholder="Employee Allowance" name="empAllowance" disabled>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="empDeduction">Employee_Deduction</label>
+                    <div class="col-sm-10">
+                        <input type="number" class="form-control" id="empDeduction" placeholder="Employee Deduction" name="empDeduction" disabled>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                    	<input type="submit" class="btn btn-primary" name="submit" value="DISPLAY"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <script>
+
+        $("#empId").focus();
+
+        var recordNumber;
+
+			function resetForm() {
+				$("#empId").val('');
+                $("#empName").val('');
+                $("#empSalary").val('');
+                $("#empAllowance").val('');
+                $("#empDeduction").val('');
+                $("#empId").focus();
+			}
+
+			function getEmployee() {
+
+				var empID = $("#empId").val();
+                var dataObj = {
+                    empId: empID
+                };
+
+                var jsonObj = JSON.stringify(dataObj)
+
+				var getFindRecordReq = createFIND_RECORDRequest("90936036|-31948847539740691|90933915", "Employee2", "emp-rel2", jsonObj);
+				alert(getFindRecordReq);
+
+				jQuery.ajaxSetup({async: false});
+
+				var respFindRecordJson = executeCommand(getFindRecordReq, "/api/irl");
+				alert(JSON.stringify(respFindRecordJson));
+
+				jQuery.ajaxSetup({async: true});
+
+				var lvData = respFindRecordJson.data;
+                var dataRecordArray = lvData[0];     // To get the desired record from response data which is in array format
+                var resultRow = dataRecordArray.record;
+                recordNumber = dataRecordArray['record number'];
+                $("#empForm-message-line").html("Record Number: " + recordNumber);
+
+                // This loop will set and display record data in the form
+                $.each(resultRow, function (index, row) {
+                        $('#' + index + '').val(row);
+                    }
+                );
+                return false;
+				
+				resetForm();
+			}
+		</script>
+
+</body>
+</html>
